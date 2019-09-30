@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <title>纷极阅读</title>
+    <script src="js/flexible.js"></script>
+    <script src="js/art-template.min.js"></script>
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/special-download.css">
+</head>
+
+<body>
+    <div id="container">
+        <div class="head-mask">
+            <img src="image/logo.png" alt="">
+            <div class="read">
+                <p class="item-text">纷极阅读</p>
+                <p class="item-text">你的小伙伴向你发出阅读邀请</p>
+            </div>
+            <div id="" class="down-load">免费下载</div>
+        </div>
+        <div class="mask" id="prompt"><img src="image/modal-min.png" alt="" class="modal"></div>
+        <div class="content">
+            <img  alt="" id="back_pic" />
+            <div id="content_wrap">
+                <div class="content-header clear-fix">
+                    <p class="title"></p>
+                    <p class="range"></p>
+                </div>
+                <h1></h1>
+                <p class="describe"></p>
+                <div class="free">限时免费</div>
+                <div class="line"></div>
+                <p class="introduction">简介</p>
+                <p id="introText"></p>
+                <div class="author">
+                    <p class="introduction">作者</p>
+                    <p class="authorMess"></p>
+                </div>
+                <div id="transform">
+                    <p style="float: left;" id="up-down">展开</p>
+                    <img src="image/up-down.png" alt="" id="rotate">
+                </div>
+                <div class="line" style="width:100%;height:0.13rem;background:rgba(244,244,244,1);"></div>
+                <div id='content'></div>
+                <script id="test" type="text/html">
+                    <div class="all-article-wrap" id='all'>
+                        <div class="all-article">—&nbsp;全部文章&nbsp;—</div>
+                        {{each article}}
+                        <div class="article-list">
+                            <img src= '{{$value.summaryPictureUrl}}' alt="" class='top_img'/>
+                            <div class="article-content">
+                                <span class="date-time">{{formatDay($value.updatedTime)}}</span>
+                                <p class="article-describe" summaryId ='{{$value.summaryId}}' levelId ='{{$value.levelId}}'>{{$value.summaryTitle}}</p> 
+                            </div>
+                        </div>
+                        {{/each}}
+                   </div>
+                </script>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+<script>
+    $(function () {
+        $('.author').hide()
+        $('#transform').click(function () {
+            $('.author').toggle()
+            $('#up-down').text($('#up-down').text() == "展开" ? "收起" : "展开")
+            if ($('#up-down').text() == "展开") {
+                $('#rotate').css({
+                    'transform': 'rotate(0deg)'
+                })
+            } else {
+                $('#rotate').css({
+                    'transform': 'rotate(180deg)'
+                })
+                $('.author').show()
+            }
+        })
+
+        var type = location.search ? location.search.substr(1) : '',
+            prompt = $('#prompt'),
+            ua = navigator.userAgent.toLowerCase(),
+            // android = 'article://seminar?topicId=',
+            // ios = 'FJYD://subjectDetail?topicId=',
+            androidStore = 'https://qiniu.fjreading.com/app-fenji-1811011458-release.apk',
+            iosStore = 'https://itunes.apple.com/us/app/%E7%BA%B7%E6%9E%81%E9%98%85%E8%AF%BB/id1369678592?l=zh&ls=1&mt=8',
+            parameter = {};
+
+            location.search.substr(1) && location.search.substr(1).split('&').forEach(function (v) {
+                var a = v.split("=")[0],
+                    b = v.split("=")[1];
+                parameter[a] = b
+            });
+
+        function isWeixin() {
+            if (ua.match(/MicroMessenger/i) == "micromessenger" || ua.match(/WeiBo/i) == "weibo" || ua.match(
+                    /\sQQ/i) == " qq") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        $(".down-load").click(function () {
+            if (isWeixin()) {
+                prompt.show()
+            } else {
+                if (ua.match(/(iPhone|iPod|iPad);?/i)) {
+                    // window.location = ios + parameter.topicId;
+                    //如果超时就跳转到app下载页
+                    // setTimeout(function () {
+                        window.location.href = iosStore;
+                    // }, 3000);
+                } else if (ua.match(/android/i)) {
+                    // window.location.href = android + parameter.topicId;
+                    // setTimeout(appStore, 3000);
+                    appStore()
+                } else {
+                    alert('PC端暂不支持下载安装，请更换移动端设备前往下载安装！谢谢！')
+                }
+            }
+        })
+
+        function appStore() {
+            if (ua.match(/vivo/i) == 'vivo') {
+                window.location.href = 'http://appdetailh5.vivo.com.cn/detail/2226832?source=2';
+            } else if (ua.match(/xiaomi/i) == 'xiaomi') {
+                window.location.href = 'http://app.mi.com/details?id=com.fenjiread.learner';
+            } else if (ua.match(/huawei/i) == 'huawei') {
+                window.location.href =
+                    'https://appgallery.cloud.huawei.com/uowap/index.html#/detailApp/C100259493';
+            } else {
+                window.location.href = androidStore;
+            }
+        }
+
+        $('.mask').click(function () {
+            $('.mask').hide()
+        })
+        
+        let params =  parameter.topicId || parameter.topic_id
+        
+        $.get("https://share.fjreading.com/api/data/student/v1/share/topic/id/" + params, function (res) {
+            if (res.code === 200 && res.data) {
+                    $('.title').text(res.data.categoryName)
+                    $('.range').text('推荐等级：Lv' + res.data.topicLevelMin + '-' + 'Lv' + res.data.topicLevelMax)
+                    $('h1').text( res.data.topicTitle )
+                    $('.describe').text(res.data.topicHigh)
+                    $('#introText').html(res.data.topicDesc.replace(/\n|\r\n/g, "<br />"))
+                    $('.authorMess').html(res.data.authorName + ',' + res.data.authorDesc.replace(/\n|\r\n/g, "<br />"))
+                    $('#back_pic').attr('src', res.data.topicPicture)
+            }
+        })
+        
+        let data = {}
+        $.get("https://share.fjreading.com/api/data/student/v1/summary/list/share/topic/id/" +  params, function (res) {
+            if (res.code === 200&& res.data) {
+                data.article = res.data
+                if( !res.data.length ){
+                    $('#content')[0].hidden = true 
+                }
+            }
+
+        
+
+            template.defaults.imports.formatDay = function(timestamp){
+                var date = new Date(timestamp);
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                return year + '.' + (String(month).length > 1 ? month : '0' + month) + '.' + (String(day).length > 1 ? day : '0' + day)
+            }
+
+            var html = template("test", data);
+            document.getElementById("content").innerHTML = html;
+        })
+
+
+        document.getElementById("content").addEventListener('click', function (e) {
+            if( e.target.className === 'article-describe' ){
+                var summaryId = e.target.getAttribute("summaryid")
+                var levelId = e.target.getAttribute("levelid")
+                window.location.href = 'https://share.fjreading.com/article-details.html?summaryId'+ "=" + summaryId +'&levelId=' + levelId
+            }
+        });
+    })
+</script>

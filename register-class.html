@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="viewport" content="user-scalable=no" />
+    <title>注册并加入班级</title>
+    <script src="js/flexible.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/register-class.css">
+</head>
+<body>
+<div id="container"/>
+</body>
+</html>
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/art-template.min.js"></script>
+<script id="box" type="text/html">
+    {{if !isWX}}
+    <div class="header clearfix">
+        <img src="image/back.png" alt="" id="back">
+        <div class="title">注册并加入班级</div>
+    </div>
+    {{/if}}
+    <div class="content">
+        <form method="POST" action="" id="signupForm">
+            <div class="inputitem">
+                <input type="number" placeholder="请输入手机号" id='phone' name="phone" maxlength="11"/>
+            </div>
+            <div id="errorphone" class="tip">
+                请输入正确手机号
+            </div>
+            <div class="inputitem yzm">
+                <input type="text" placeholder="请输入验证码" type='number' id="yzm" name="yzm"/>
+                <button type='button' id="sendcode">发送验证码</button>
+            </div>
+            <div id="erroryzm" class="tip">
+                验证码输入错误
+            </div>
+            <div class="inputitem">
+                <input type="text" placeholder="请输入学生真实姓名" id='user' name="user"/>
+            </div>
+            <div id="errorusername" class="tip">
+                姓名输入错误
+            </div>
+            <div class="inputitem pwd">
+                <input type="password" placeholder="请设置6-12位密码" id="pwd" name="pwd" minlength="6" maxlength="12"/>
+                <img src="image/closeeye.png" alt="" id="openHandler"/>
+            </div>
+            <div id="errorpwd" class="tip">
+                请设置6-12位密码
+            </div>
+            <div class="inputitem cpwd">
+                <input type="password" placeholder="请输入确认密码" id="confirmpwd" name="confirmpwd" maxlengt='12'/>
+                <img src="image/closeeye.png" alt="" id="closeHandler"/>
+            </div>
+            <div id="errorconfirmpwd" class="tip">
+                两次密码输入不相同，请重新输入
+            </div>
+            <div id="wrap">
+                <div id="confirmSubmit">确定</div>
+            </div>
+        </form>
+    </div>
+</script>
+<script>
+    $(function () {
+        var ua = window.navigator.userAgent.toLowerCase();
+
+        if (ua.indexOf('micromessenger') === -1){
+            var data = { isWX : false }
+            var html = template('box', data)
+            $('#container').html(html)
+        }else{
+            var data = { isWX : true }
+            var html = template('box', data)
+            $('#container').html(html)
+        }
+
+        var parameter = {}
+
+        location.search.substr(1) && decodeURI(location.search.substr(1)).split('&').forEach(function (v) {
+            var a = v.split("=")[0], b = v.split("=")[1];
+            parameter[a] = b
+        })
+
+        $('#back').click(function () {
+            $(location).attr('href',encodeURI("invitate-class.html?className=" + parameter.className +
+                '&inviteCode=' + parameter.inviteCode + '&teacherName=' + parameter.teacherName));
+        })
+
+        $('#sendcode').click(function () {
+            if (!(/^1[34578]\d{9}$/.test($('#phone').val()))) {
+                $('#errorphone').css({'visibility': 'visible'})
+                $('#errorphone').text('请先输入正确的手机号')
+                $('#errorphone').focus();
+            } else {
+                //----------------------------------请求获取验证码--------------------------------------------------------------------------------------------------------------------
+                // $.get("" + , function (res) {
+                //     if (res.code === 200 && res.data) {
+                //         var response = res.data,
+                //     }
+                // })
+                //------------------------------------------------------------------------------------------------------------------------------------------------------
+                $('#errorphone').css({'visibility': 'hidden'})
+                let timeLast = 60;
+                let timer = setInterval(() => {
+                    if (timeLast > 0) {
+                        $('#sendcode').text(timeLast + '秒后重试')
+                        $('#sendcode').attr({'disabled': true})
+                        timeLast -= 1;
+                    } else {
+                        clearInterval(timer);
+                        $('#sendcode').text('获取验证码')
+                        $('#sendcode').attr({'disabled': false})
+                    }
+                }, 1000);
+            }
+        })
+
+        $('#openHandler').click(function () {
+            if ($('#pwd').attr('type') === "password") {
+                $('#pwd').attr('type', 'text')
+                $('#openHandler').attr('src', 'image/openeye.png')
+            } else {
+                $('#pwd').attr('type', 'password')
+                $('#openHandler').attr('src', 'image/closeeye.png')
+            }
+        })
+
+        $('#closeHandler').click(function () {
+            if ($('#confirmpwd').attr('type') === "password") {
+                $('#confirmpwd').attr('type', 'text')
+                $('#closeHandler').attr('src', 'image/openeye.png')
+            } else {
+                $('#confirmpwd').attr('type', 'password')
+                $('#closeHandler').attr('src', 'image/closeeye.png')
+            }
+        })
+
+        $('#confirmSubmit').click(function () {
+            if (!(/^1[34578]\d{9}$/.test($('#phone').val()))) {
+                $('#errorphone').css({'visibility': 'visible'})
+                return false;
+            } else {
+                $('#errorphone').css({'visibility': 'hidden'})
+            }
+
+            if (!$('#yzm').val()) {
+                $('#erroryzm').css({'visibility': 'visible'})
+                $('#erroryzm').text('验证码输入不能为空')
+                return false;
+            } else {
+                $('#erroryzm').css({'visibility': 'hidden'})
+            }
+
+            var reg = /[\u4e00-\u9fa5]/;
+            var str = $.trim($('#user').val());
+            if (str) {
+                var arr = str.split(''), length = 0;
+                arr.forEach((v, i, s) => s[i] = reg.test(v));
+                arr.forEach(v => v ? length += 2 : length += 1)
+                if (length > 12) {
+                    $('#errorusername').css({'visibility': 'visible'})
+                    $('#errorusername').text('姓名为六个中文字符或12个英文特殊字符')
+                    return false;
+                } else {
+                    $('#errorusername').css({'visibility': 'hidden'})
+                }
+            } else {
+                $('#errorusername').css({'visibility': 'visible'})
+                $('#errorusername').text('姓名不能为空')
+                return false;
+            }
+
+            var pwdValue = $.trim($('#pwd').val());
+            if (reg.test(pwdValue)) {
+                $('#errorpwd').css({'visibility': 'visible'})
+                $('#errorpwd').text('不能输入中文字符')
+                return false;
+            } else if (pwdValue.length < 6) {
+                $('#errorpwd').css({'visibility': 'visible'})
+                return false;
+            } else {
+                $('#errorpwd').css({'visibility': 'hidden'})
+            }
+
+            var confirmPwdValue = $.trim($('#confirmpwd').val());
+            if (!confirmPwdValue) {
+                $('#errorconfirmpwd').css({'visibility': 'visible'})
+                $('#errorconfirmpwd').text('二次输入密码不能为空')
+                return false;
+            } else if (pwdValue !== confirmPwdValue) {
+                $('#errorconfirmpwd').css({'visibility': 'visible'})
+                $('#errorconfirmpwd').text('两次输入的密码不一致')
+                return false;
+            } else {
+                $('#errorconfirmpwd').css({'visibility': 'hidden'})
+            }
+            
+            // var params = {
+            //     'username': $('#user').val(),
+            //     'mobile': $('#phone').val(),
+            //     'password': $('#pwd').val(),
+            //     'code': $('#yzm').val()
+            // }
+            // $.post("http://dev.fenjiread.com/api/user/v2/join/class",params,function(res){
+            //     console.log( res)
+            // });
+            
+            $(location).attr('href',encodeURI("add-class-result.html?className=" + parameter.className +
+                '&inviteCode=' + parameter.inviteCode + '&teacherName=' + parameter.teacherName));
+            })
+    })
+</script>

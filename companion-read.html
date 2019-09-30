@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <title></title>
+    <script src="js/flexible.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/companion-read.css">
+</head>
+<body>
+<div id="companion-read">
+    <div id="prompt">请点击右上角的按钮，选择在浏览器中打开</div>
+    <img src="image/flower.png" alt="" id="flower">
+    <div class="read-details">
+        <p><span class="important" id="name">孩子</span>在纷极阅读</p>
+        <p>累计阅读<span class="important" id="minute">0</span>分钟，共计<span class="important" id="words">0</span>字</p>
+    </div>
+    <img src="image/moon.png" alt="" id="moon">
+    <img src="image/button.png" alt="" id="down-load">
+    <div class="logo-box">
+        <div class="logo">
+            <img src="image/logo.png" alt="" class="logo-image">
+        </div>
+        <div class="logo-text">
+            <p class="fj-title">纷极阅读</p>
+            <p class="fj-text">读点儿好的</p>
+        </div>
+    </div>
+</div>
+<script src="js/jquery-2.1.4.min.js"></script>
+<script>
+    $(function () {
+        document.addEventListener('click', function (e) {
+            if (e.target.id !== 'down-load' && e.target.id !== 'prompt') $('#prompt').hide()
+        })
+
+        var parameter = {},
+            android = 'https://qiniu.fjreading.com/app-fenji-1811011458-release.apk',
+            ios = 'https://itunes.apple.com/us/app/%E7%BA%B7%E6%9E%81%E9%98%85%E8%AF%BB/id1369678592?l=zh&ls=1&mt=8';
+
+        location.search.substr(1) && location.search.substr(1).split('&').forEach(function (v) {
+            var a = v.split("=")[0], b = v.split("=")[1];
+            parameter[a] = b
+        })
+
+        $.get("https://share.fjreading.com/api/stats/v1/data/transmit/read/speed/" + parameter.uuid, function (res) {
+            if (res.code === 200 && res.data) {
+                document.title = res.data.realName + '的阅读报告'
+                $("#name").text(res.data.realName)
+                $("#minute").text(Math.ceil(res.data.readTotalTime / 60))
+                $("#words").text(res.data.readTotalWords)
+            }
+        })
+
+        function isWeixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        $('#down-load').click(function () {
+            if (isWeixin()) {
+                $('#prompt').show()
+            } else {
+                if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i)) {
+                    window.location = ios;
+                } else if (navigator.userAgent.match(/android/i)) {
+                    window.location = android;
+                } else {
+                    alert('PC端暂不支持下载安装，请更换移动端设备前往下载安装！谢谢！')
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

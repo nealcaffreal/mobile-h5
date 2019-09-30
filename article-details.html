@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <title></title>
+    <script src="js/flexible.js"></script>
+    <link rel="stylesheet" href="css/reset.css"/>
+    <link rel="stylesheet" href="css/article-details.css">
+</head>
+<body>
+<div id="container">
+    <div class="mask">
+        <div id="prompt">请点击右上角的按钮，选择在浏览器中打开</div>
+        <img src="image/logo.png" alt="">
+        <div class="read">
+            <p class="item-text">纷极阅读</p>
+            <p class="item-text">你的小伙伴向你发出阅读邀请</p>
+        </div>
+        <div id="down-load">接受</div>
+    </div>
+    <div class="clear-fix">
+        <img src="" alt="" id="head-image">
+        <div class="content">
+            <audio src='' id="audio-demo"></audio>
+            <div id="title"></div>
+            <div id="audio">
+                <div id="audio-title"></div>
+                <div id="audio-detail">
+                    <img src="./image/play.png" alt="" id="play-btn">
+                    <div id="progress-bar">
+                        <div id="progress-bar-dynamic"></div>
+                        <img src="./image/circular.png" alt="" id="play-circular">
+                    </div>
+                    <div id="audio-time">
+                        <span class="vacancy"></span>
+                        <span id="current-time">00:00</span>
+                        <span>/</span>
+                        <span id="count-time">00:00</span>
+                    </div>
+                </div>
+            </div>
+            <div id="text"></div>
+        </div>
+    </div>
+</div>
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/art-template.min.js"></script>
+<script>
+    $(function () {
+        var parameter  = {},
+            prompt     = $('#prompt'),
+            playBtn    = $('#play-btn'),
+            theAudio   = $('audio').get(0),
+            curTime    = $('#current-time'),
+            circular   = $('#play-circular'),
+            bar        = $('#progress-bar'),
+            barDynamic = $('#progress-bar-dynamic'),
+            isTouch    = 'ontouchstart' in window,
+            eStart     = isTouch ? 'touchstart' : 'mousedown',
+            eMove      = isTouch ? 'touchmove' : 'mousemove',
+            eEnd       = isTouch ? 'touchend' : 'mouseup',
+            eCancel    = isTouch ? 'touchcancel' : 'mouseup',
+            android    = 'https://qiniu.fjreading.com/app-fenji-1811011458-release.apk',
+            ios        = 'https://itunes.apple.com/us/app/%E7%BA%B7%E6%9E%81%E9%98%85%E8%AF%BB/id1369678592?l=zh&ls=1&mt=8',
+            secondsToTime = function (secs) {
+                var hours = Math.floor(secs / 3600), minutes = Math.floor(secs % 3600 / 60),seconds = Math.ceil(secs % 3600 % 60);
+                return (hours == 0 ? '' : hours > 0 && hours.toString().length < 2 ? '0' + hours + ':' : hours + ':') + (minutes.toString().length < 2 ? '0' + minutes : minutes) + ':' + (seconds.toString().length < 2 ? '0' + seconds : seconds);
+            }
+
+        document.addEventListener('click', function (e) {
+            if (e.target.id !== 'down-load' && e.target.id !== 'prompt') prompt.hide()
+        });
+
+        theAudio.addEventListener('timeupdate', function (e) {
+            var duration = theAudio.duration
+            if (duration) {
+                curTime.text(secondsToTime(Math.round(e.target.currentTime)))
+                barDynamic.width(e.target.currentTime / duration * 100 + '%')
+                circular.css('left', e.target.currentTime / duration * 100 + '%')
+            }
+            if (e.target.currentTime === duration) {
+                theAudio.load()
+                barDynamic.width(0)
+                curTime.text('00:00')
+                circular.css('left', 0)
+                playBtn.attr('src', './image/play.png')
+            }
+        });
+
+        playBtn.click(function () {
+            if (playBtn.attr('src') === "./image/play.png") {
+                theAudio.play()
+                playBtn.attr('src', './image/pause.png')
+            } else {
+                theAudio.pause()
+                playBtn.attr('src', './image/play.png')
+            }
+        })
+
+        var adjustCurrentTime = function (e) {
+            var duration = theAudio.duration
+            if (duration) {
+                var theRealEvent = isTouch ? e.originalEvent.touches[0] : e,
+                    left = (theRealEvent.pageX - bar.offset().left) / bar.width() * 100,
+                    time = duration * (theRealEvent.pageX - bar.offset().left) / bar.width();
+                barDynamic.width(left >= 100 ? '100%' : left + '%')
+                circular.css('left', left >= 100 ? '100%' : left + '%')
+                theAudio.currentTime = time >= duration ? Math.round(duration) : Math.round(time)
+                curTime.text(time >= duration ? secondsToTime(Math.round(duration)) : secondsToTime(Math.round(time)))
+            }
+        }
+
+        bar.on(eStart, function (e) {
+                adjustCurrentTime(e);
+                bar.on(eMove, function (e) {
+                    adjustCurrentTime(e);
+                });
+            })
+            .on(eCancel, function () {
+                bar.unbind(eMove);
+            });
+
+        location.search.substr(1) && location.search.substr(1).split('&').forEach(function (v) {
+            var a = v.split("=")[0], b = v.split("=")[1];
+            parameter[a] = b
+        });
+
+        $.get("https://share.fjreading.com/api/data/transmit/v1/summary/" + parameter.summaryId + "/" + parameter.levelId, function (res) {
+            if (res.code === 200 && res.data) {
+                var response = res.data,
+                    contentArr = response.levelContent,
+                    picList = response.levelPictureList;
+                if (picList.length) {
+                    contentArr = contentArr.split('');
+                    for (var i = 0, len = picList.length; i < len; i++) {
+                        picList[i].levelPictureUrl && contentArr.splice(Number(picList[i].picturePosition) + i, 0, "<img src=" + picList[i].levelPictureUrl + ">");
+                    }
+                    contentArr = contentArr.join('').replace(/\n|\r\n/g, "<br />");
+                    $('#text').html(contentArr)
+                } else {
+                    $('#text').html(contentArr.replace(/\n|\r\n/g, "<br />"))
+                }
+                document.title = response.summaryTitle;
+                $('#title').text(response.summaryTitle);
+                $('#audio-title').text(response.audioName);
+                $('#head-image').attr('src', response.summaryPictureUrl)
+                if (response.audioUrl) {
+                    $('#audio').css('display', 'block')
+                    $('audio').attr('src', response.audioUrl)
+                    $('#count-time').html(secondsToTime(response.audioDuration))
+                    $('#progress-bar').css('right', $('#audio-time').width() + 'px')
+                }
+            }
+        })
+
+        function isWeixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        $("#down-load").click(function () {
+            if (isWeixin()) {
+                prompt.show()
+            } else {
+                if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i)) {
+                    window.location = ios;
+                } else if (navigator.userAgent.match(/android/i)) {
+                    window.location = android;
+                } else {
+                    alert('PC端暂不支持下载安装，请更换移动端设备前往下载安装！谢谢！')
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>
+<!--<script id="comment" type="text/html">-->
+<!--<h1 class="wonderful-comments">精彩评论</h1>-->
+<!--{{each commentList}}-->
+<!--<div class="group">-->
+<!--<div class="clear-fix">-->
+<!--<div class="comment-left">-->
+<!--<img src="./image/logo.png" alt="" class="head-pic">-->
+<!--<div class="pre-info">-->
+<!--<div class="comment-name">张小北</div>-->
+<!--<div class="date">2018.6.4</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="comment-right">-->
+<!--<img src="./image/fabulous.png" alt="" class="fabulous-pic">-->
+<!--<span class="fabulous-text">{{$value.num}}赞</span>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="comment-text">很棒，太厉害了</div>-->
+<!--<div class="comment-reply">-->
+<!--<div class="comment-reply-pic-box">-->
+<!--<img src="./image/mark.png" alt="" class="comment-reply-pic">-->
+<!--</div>-->
+<!--<p class="comment-reply-text">-->
+<!--今年二月份以来，台湾东部地区经常发生地震，损失严重，好几位大陆游客也不幸在地震中丧生-->
+<!--</p>-->
+<!--</div>-->
+<!--</div>-->
+<!--{{/each}}-->
+<!--</script>-->

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="viewport" content="user-scalable=no" />
+    <title>邀请加入班级</title>
+    <script src="js/flexible.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/invitate-class.css">
+</head>
+<body>
+<div id = "container">
+    <div class="content">
+        <div id="title"></div>
+        <div id="classCode"></div>
+        <div class="tip">如果你没有注册过纷极阅读</div>
+        <div type='button' class='tip_button' id="register">注册并加入班级</div>
+        <div class="tip">如果你已注册，但没有加入班级</div>
+        <div type="button" class='tip_button' id="addClass">加入班级</div>
+        <div class="circlebox">
+            <span class="left-circle"></span>
+            <div class="dotted-line"></div>
+            <span class="right-circle"></span>
+        </div>
+        <div class="pwd">
+            <img src="image/pwd.png" alt="" id="pwd">
+        </div>
+        <p class="definitate">长按识别关注纷极公众号</p>
+    </div>
+</div>
+</body>
+</html>
+<script src="js/jquery-2.1.4.min.js"></script>
+<script>
+    $(function () {
+        var parameter = {}
+
+        location.search.substr(1) && decodeURI(location.search.substr(1)).split('&').forEach(function (v) {
+            var a = v.split("=")[0], b = v.split("=")[1];
+            parameter[a] = b
+        })
+
+        $('#title').text((parameter.teacherName || '') + '老师邀请你加入' + (parameter.className || ''))
+        $('#classCode').text('班级码：'+ (parameter.inviteCode || ''))
+
+        $('#register').click(function(){
+            $(location).attr('href',encodeURI("register-class.html?className=" + parameter.className +
+                '&inviteCode=' + parameter.inviteCode + '&teacherName=' + parameter.teacherName)); 
+        })
+
+        $('#addClass').click(function(){
+            $(location).attr('href',encodeURI("add-class.html?className=" + parameter.className +
+                '&inviteCode=' + parameter.inviteCode + '&teacherName=' + parameter.teacherName));
+        })
+    })
+</script>

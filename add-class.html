@@ -1,0 +1,117 @@
+<!--
+ * @Description: 
+ * @Author: yangming
+ * @Date: 2019-01-16 17:39:59
+ * @LastEditTime: 2019-09-30 15:34:36
+ * @LastEditors: Do not edit
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="viewport" content="user-scalable=no"/>
+    <title>加入班级</title>
+    <script src="js/flexible.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/add-class.css">
+</head>
+<body>
+<div id="container"/>
+</body>
+</html>
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/art-template.min.js"></script>
+<script id="box" type="text/html">
+    {{if !isWX}}
+    <div class="header clearfix">
+        <img src="image/back.png" alt="" id="back">
+        <div class="title">加入班级</div>
+    </div>
+    {{/if}}
+    <div class="content">
+        <form method="POST" action="" id="signupForm">
+            <div class="inputitem">
+                <input type="number" placeholder="请输入手机号" id='phone' name="phone" maxlength="11"/>
+            </div>
+            <div id="errorphone" class="tip">请输入正确手机号</div>
+            <div class="inputitem pwd">
+                <input type="text" placeholder="请设置6-12位密码" id="pwd" name="pwd"/>
+                <img src="image/openeye.png" alt="" id="openHandler">
+            </div>
+            <div id="errorpwd" class="tip">请设置6-12位密码</div>
+            <div type="submit" id="confirmSubmit">确定</div>
+        </form>
+    </div>
+</script>
+<script>
+    $(function () {
+        var ua = window.navigator.userAgent.toLowerCase();
+
+        if (ua.indexOf('micromessenger') === -1) {
+            var data = {isWX: false}
+            var html = template('box', data)
+            $('#container').html(html)
+        } else {
+            var data = {isWX: true}
+            var html = template('box', data)
+            $('#container').html(html)
+        }
+
+        var parameter = {}
+
+        location.search.substr(1) && decodeURI(location.search.substr(1)).split('&').forEach(function (v) {
+            var a = v.split("=")[0], b = v.split("=")[1];
+            parameter[a] = b
+        })
+
+        $('#back').click(function () {
+            $(location).attr('href', encodeURI("invitate-class.html?className=" + parameter.className +
+                '&inviteCode=' + parameter.inviteCode + '&teacherName=' + parameter.teacherName));
+        })
+
+        $('#openHandler').click(function () {
+            if ($('#pwd').attr('type') === "password") {
+                $('#pwd').attr('type', 'text')
+                $('#openHandler').attr('src', 'image/openeye.png')
+            } else {
+                $('#pwd').attr('type', 'password')
+                $('#openHandler').attr('src', 'image/closeeye.png')
+            }
+        })
+
+        $('#confirmSubmit').click(function () {
+            if (!(/^1[34578]\d{9}$/.test($('#phone').val()))) {
+                $('#errorphone').css({'visibility': 'visible'})
+                return false
+            } else {
+                $('#errorphone').css({'visibility': 'hidden'})
+            }
+
+            var reg = /[\u4e00-\u9fa5]/;
+            var str = $.trim($('#pwd').val());
+            console.log( str )
+            if (str) {
+                var arr = str.split(''), length = 0;
+                arr.forEach((v, i, s) => s[i] = reg.test(v));
+                console.log( arr )
+                arr.forEach(v => v ? length += 2 : length += 1)
+                if (length > 12) {
+                    $('#errorusername').css({'visibility': 'visible'})
+                    $('#errorusername').text('姓名为六个中文字符或12个英文特殊字符')
+                    return false;
+                } else {
+                    $('#errorusername').css({'visibility': 'hidden'})
+                }
+            } else {
+                $('#errorusername').css({'visibility': 'visible'})
+                $('#errorusername').text('姓名不能为空')
+                return false;
+            }
+
+            $(location).attr('href', encodeURI("add-class-result.html?className=" + parameter.className +
+                '&inviteCode=' + parameter.inviteCode + '&teacherName=' + parameter.teacherName));
+        })
+    })
+</script>

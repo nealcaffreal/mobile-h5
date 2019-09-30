@@ -1,0 +1,239 @@
+<!--
+ * @Description: 
+ * @Author: yangming
+ * @Date: 2019-01-16 17:39:59
+ * @LastEditTime: 2019-08-27 11:31:58
+ * @LastEditors: Do not edit
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <title>词云分享</title>
+    <script src="js/flexible.js"></script>
+    <script src="js/art-template.min.js"></script>
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/word-cloud-sharing.css">
+</head>
+<body>
+    <div id = "container">
+            <div class="head-mask">
+                    <div id="prompt">请点击右上角的按钮，选择在浏览器中打开</div>
+                    <img src="image/logo.png" alt="">
+                    <div class="read">
+                        <p class="item-text">纷极阅读</p>
+                        <p class="item-text">快来和我一起养成词云吧~</p>
+                    </div>
+                    <div id="head-down-load" class="down-load">免费下载</div>
+            </div>
+            <div class="head-describe"> 
+                <img id = 'avater'src="image/logo.png" alt="">
+                <div class="right-content">
+                    <p id="name">张小北</p>
+                    <p id="describe">词云星球又发生了日新月异的变化……</p>
+                </div>
+            </div> 
+            <!-- 旋转 -->
+            <div class="tagBall"></div>
+            <div class="bottom">
+                <p id="energy">总能量</p>
+                <p id="sum">22,345</p>
+            </div>
+    </div>
+    
+
+<script id="test" type="text/html">
+    {{each alist}}
+    <a href="javascript:void(0);" class = "{{$value.color}} tag">{{$value.text}}</a>
+    {{/each}}
+</script>
+            
+<script>
+    var data = {
+        alist:[
+            //0-10 white
+            //11-25 green
+            //26-45 blue
+            //46-70 purple
+            /// 70+ orange
+            {value:"2",text:'首页'},
+            {value:"5",text:'首页'},
+            {value:"3",text:'首页'},
+            {value:"8",text:'首页'},
+            {value:"3",text:'首页'},
+            {value:"12",text:'关于词能'},
+            {value:"13",text:'关于词能'},
+            {value:"14",text:'关于词能'},
+            {value:"20",text:'关于词能'},
+            {value:"25",text:'关于词能'},
+            {value:"26",text:'滴滴滴'},
+            {value:"27",text:'滴滴滴'},
+            {value:"36",text:'滴滴滴'},
+            {value:"40",text:'滴滴滴'},
+            {value:"45",text:'滴滴滴'},
+            {value:"26",text:'小程序'},
+            {value:"27",text:'小程序'},
+            {value:"36",text:'小程序'},
+            {value:"40",text:'小程序'},
+            {value:"45",text:'小程序'},
+            {value:"70",text:'hello'},
+            {value:"78",text:'hello'},
+            {value:"100",text:'hello'},
+            {value:"89",text:'hello'},
+            {value:"90",text:'hello'},
+        ]
+    };
+    len = data.alist.length;
+    for(var i=0;i<len;i++){
+        var a = data.alist[i].value;
+        if(a >= 0 && a <= 10 ){
+            data.alist[i].color = 'white';
+        }else if(a >= 11 && a <= 25){
+            data.alist[i].color = 'green';
+        }else if(a >= 26 && a <= 45){
+            data.alist[i].color = 'blue';
+        }else if(a >= 46 && a < 70){
+            data.alist[i].color = 'purple';
+        }else if(a >= 70){
+            data.alist[i].color = 'orange';
+        }
+    }
+    var html = template("test",data); 
+    document.querySelector(".tagBall").innerHTML = html;
+</script>
+</body>
+</html>
+
+
+
+<script>
+    var tagEle = "querySelectorAll" in document ? document.querySelectorAll(".tag") : getClass("tag"),
+        paper = "querySelectorAll" in document ? document.querySelector(".tagBall") : getClass("tagBall")[0];
+        RADIUS = 300,
+        fallLength = 500,
+        tags = [],
+        angleX = Math.PI / 500,
+        angleY = Math.PI / 500,
+        CX = paper.offsetWidth / 2,
+        CY = paper.offsetHeight / 2,
+        EX = paper.offsetLeft + document.body.scrollLeft + document.documentElement.scrollLeft,
+        EY = paper.offsetTop + document.body.scrollTop + document.documentElement.scrollTop;
+
+    function getClass(className) {
+        var ele = document.getElementsByTagName("*");
+        var classEle = [];
+        for (var i = 0; i < ele.length; i++) {
+            var cn = ele[i].className;
+            if (cn === className) {
+                classEle.push(ele[i]);
+            }
+        }
+        return classEle;
+    }
+
+    function innit() {
+        for (var i = 0; i < tagEle.length; i++) {
+            var a, b;
+            var k = (2 * (i + 1) - 1) / tagEle.length - 1;
+            var a = Math.acos(k);
+            var b = a * Math.sqrt(tagEle.length * Math.PI);
+            // var a = Math.random()*2*Math.PI;
+            // var b = Math.random()*2*Math.PI;
+            var x = RADIUS * Math.sin(a) * Math.cos(b);
+            var y = RADIUS * Math.sin(a) * Math.sin(b);
+            var z = RADIUS * Math.cos(a);
+            var t = new tag(tagEle[i], x, y, z);
+            // tagEle[i].style.color .style.color = "rgb(" + parseInt(Math.random() * 255) + "," + parseInt(Math.random() * 255) + "," + parseInt(Math.random() * 255) + ")";
+            tags.push(t);
+            t.move();
+        }
+    }
+
+    Array.prototype.forEach = function (callback) {
+        for (var i = 0; i < this.length; i++) {
+            callback.call(this[i]);
+        }
+    }
+
+    function animate() {
+        setInterval(function () {
+            rotateX();
+            rotateY();
+            tags.forEach(function () {
+                this.move();
+            })
+        }, 17)
+    }
+    
+
+    // if ("addEventListener" in window) {
+        paper.addEventListener("touchmove", function (event) {
+            var touch = event.touches[0]; //获取第一个触点
+            var a = Number(touch.pageX); //页面触点X坐标
+            var b = Number(touch.pageY); //页面触点Y坐标
+            var x = a- EX - CX;
+            var y = b - EY - CY;
+            // angleY = -x* (Math.sqrt(Math.pow(x , 2) + Math.pow(y , 2)) > RADIUS/4 ? 0.0002 : 0.0001);
+            // angleX = -y* (Math.sqrt(Math.pow(x , 2) + Math.pow(y , 2)) > RADIUS/4 ? 0.0002 : 0.0001);
+            angleY = -x * 0.0001;
+            angleX = -y * 0.0001;
+        });
+    // }
+    // else {
+    //     paper.attachEvent("onmousemove", function (event) {
+    //         var x = event.clientX - EX - CX;
+    //         var y = event.clientY - EY - CY;
+    //         angleY = x * 0.0001;
+    //         angleX = y * 0.0001;
+    //     });
+    // }
+
+    function rotateX() {
+        var cos = Math.cos(angleX);
+        var sin = Math.sin(angleX);
+        tags.forEach(function () {
+            var y1 = this.y * cos - this.z * sin;
+            var z1 = this.z * cos + this.y * sin;
+            this.y = y1;
+            this.z = z1;
+        })
+
+    }
+
+    function rotateY() {
+        var cos = Math.cos(angleY);
+        var sin = Math.sin(angleY);
+        tags.forEach(function () {
+            var x1 = this.x * cos - this.z * sin;
+            var z1 = this.z * cos + this.x * sin;
+            this.x = x1;
+            this.z = z1;
+        })
+    }
+
+    var tag = function (ele, x, y, z) {
+        this.ele = ele;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    tag.prototype = {
+        move: function () {
+            var scale = fallLength / (fallLength - this.z);
+            var alpha = (this.z + RADIUS) / (2 * RADIUS);
+            // this.ele.style.fontSize = 15 * scale + "px";
+            // this.ele.style.fontSize = 15 + "px";
+            this.ele.style.opacity = alpha + 0.5;
+            this.ele.style.filter = "alpha(opacity = " + (alpha + 0.5) * 100 + ")";
+            this.ele.style.zIndex = parseInt(scale * 100);
+            this.ele.style.left = this.x + CX - this.ele.offsetWidth / 2 + "px";
+            this.ele.style.top = this.y + CY - this.ele.offsetHeight / 2 + "px";
+        }
+    }
+    innit();
+    animate();
+</script>

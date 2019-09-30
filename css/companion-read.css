@@ -1,0 +1,329 @@
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 991px) {
+    #companion-read {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        text-align: center;
+        background-size: 100% 100%;
+        background-image: url("../image/background.jpg");
+    }
+
+    #prompt {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1rem;
+        display: none;
+        color: #fff;
+        z-index: 99999;
+        position: fixed;
+        line-height: 1rem;
+        font-size: 0.4rem;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    #flower {
+        top: 0;
+        left: 0;
+        z-index: 9;
+        width: 4rem;
+        height: 3rem;
+        position: absolute;
+    }
+
+    .read-details {
+        width: 100%;
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    #name {
+        margin-left: 0;
+        margin-right: 5px;
+    }
+
+    .important {
+        margin: 0 2px;
+        color: #C99D53;
+        font-size: 0.6rem;
+    }
+
+    .read-details p {
+        color: #333333;
+        line-height: 0.8rem;
+        font-size: 0.36rem;
+        white-space: nowrap;
+    }
+
+    #moon {
+        top: 51%;
+        left: 50%;
+        width: 6.3rem;
+        height: 6.3rem;
+        position: absolute;
+        transform: translate(-50%, -50%);
+    }
+
+    #down-load {
+        left: 0;
+        bottom: 2.2rem;
+        width: 100%;
+        position: absolute;
+    }
+
+    .logo-box {
+        bottom: 0.6rem;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+    }
+
+    .logo {
+        display: inline-block;
+    }
+
+    .logo-image {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .logo-text {
+        margin-left: 0.3rem;
+        text-align: left;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .logo-text p {
+        color: #333333;
+    }
+
+    .fj-title {
+        font-size: 0.36rem;
+        line-height: 0.5rem;
+        letter-spacing: 2px;
+    }
+
+    .fj-text {
+        font-size: 0.3rem;
+        line-height: 0.4rem;
+    }
+}
+
+@media only screen
+and (min-device-width: 992px) {
+    #companion-read {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        text-align: center;
+        background-size: 100% 100%;
+        background-image: url("../image/background.jpg");
+    }
+
+    #prompt {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1rem;
+        display: none;
+        color: #fff;
+        z-index: 999;
+        position: fixed;
+        line-height: 1rem;
+        font-size: 0.4rem;
+        text-align: center;
+        background-color: #999;
+    }
+
+    .read-details {
+        width: 100%;
+        margin-top: 3rem;
+        text-align: center;
+    }
+
+    #name {
+        margin-left: 0;
+        margin-right: 5px;
+    }
+
+    .important {
+        margin: 0 2px;
+        color: #C99D53;
+        font-size: 0.9rem;
+    }
+
+    .read-details p {
+        color: #333333;
+        line-height: 1.2rem;
+        font-size: 0.5rem;
+        white-space: nowrap;
+        letter-spacing: 1px;
+    }
+
+    #moon {
+        top: 52%;
+        left: 50%;
+        width: 12rem;
+        height: 12rem;
+        position: absolute;
+        transform: translate(-50%, -50%);
+    }
+
+    #flower {
+        top: 0;
+        left: 0;
+        width: 6rem;
+        height: 5rem;
+        position: absolute;
+    }
+
+    #down-load {
+        left: 0;
+        bottom: 2.7rem;
+        width: 100%;
+        position: absolute;
+    }
+
+    .logo-box {
+        bottom: 1rem;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+    }
+
+    .logo {
+        display: inline-block;
+    }
+
+    .logo-image {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .logo-text {
+        margin-left: 0.3rem;
+        text-align: left;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .logo-text p {
+        color: #333333;
+    }
+
+    .fj-title {
+        font-size: 0.46rem;
+        line-height: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    .fj-text {
+        font-size: 0.4rem;
+        line-height: 0.5rem;
+    }
+}
+
+@media only screen
+and (min-device-width: 1200px) {
+    #companion-read {
+        background-size: 100% 100%;
+        background-image: url("../image/background.jpg");
+    }
+
+    .read-details {
+        width: 100%;
+        margin-top: 100px;
+        text-align: center;
+    }
+
+    #name {
+        margin-left: 0;
+        margin-right: 5px;
+    }
+
+    .important {
+        margin: 0 2px;
+        color: #C99D53;
+        font-size: 0.9rem;
+    }
+
+    .read-details p {
+        color: #333333;
+        line-height: 1.2rem;
+        font-size: 0.5rem;
+        white-space: nowrap;
+        letter-spacing: 1px;
+    }
+
+    #moon {
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        position: absolute;
+        transform: translate(-50%, -50%);
+    }
+
+    #flower {
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 200px;
+        position: absolute;
+    }
+
+    #down-load {
+        left: 50%;
+        bottom: 2.7rem;
+        width: 750px;
+        height: 84px;
+        position: absolute;
+        transform: translateX(-50%);
+    }
+
+    .logo-box {
+        bottom: 1rem;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+    }
+
+    .logo {
+        display: inline-block;
+    }
+
+    .logo-image {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .logo-text {
+        margin-left: 0.3rem;
+        text-align: left;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .logo-text p {
+        color: #333333;
+    }
+
+    .fj-title {
+        font-size: 0.46rem;
+        line-height: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    .fj-text {
+        font-size: 0.4rem;
+        line-height: 0.5rem;
+    }
+}
